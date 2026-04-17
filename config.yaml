@@ -1,0 +1,115 @@
+# Predictive Maintenance System Configuration
+
+data:
+  raw_data_path: "data/raw/"
+  processed_data_path: "data/processed/"
+  cache_path: "data/cache/"
+  
+datasets:
+  uci_ai4i:
+    id: 601
+    name: "AI4I 2020 Predictive Maintenance"
+  nasa_cmaps:
+    name: "NASA CMAPS Turbofan Degradation"
+    kaggle_id: "behrad3d/nasa-cmaps"
+  azure_maintenance:
+    name: "Microsoft Azure Predictive Maintenance"
+    kaggle_id: "arnabbiswas1/microsoft-azure-predictive-maintenance"
+  machine_failure:
+    name: "Machine Failure Dataset"
+    kaggle_id: "kartikaytandon/machine-failure"
+
+preprocessing:
+  missing_value_strategy: "forward_fill"  # Options: forward_fill, mean, median, drop
+  outlier_method: "iqr"  # Options: iqr, zscore, isolation_forest
+  outlier_threshold: 1.5  # IQR multiplier or z-score threshold
+  normalization: "standard"  # Options: standard, minmax, robust
+  balance_method: "smote"  # Options: smote, random_oversample, class_weights
+  test_size: 0.2
+  validation_size: 0.1
+  random_state: 42
+
+features:
+  rolling_windows: [3, 7, 14, 30]
+  lag_features: [1, 2, 3, 5, 7]
+  include_interactions: true
+  max_interaction_degree: 2
+  feature_selection: true
+  feature_selection_k: 50  # Top K features to keep
+
+models:
+  default_model: "xgboost"
+  prediction_windows: [1, 3, 7]  # Days ahead to predict
+  enable_ensemble: true
+  
+  random_forest:
+    n_estimators: 200
+    max_depth: 20
+    min_samples_split: 5
+    random_state: 42
+  
+  xgboost:
+    n_estimators: 300
+    max_depth: 10
+    learning_rate: 0.1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+  
+  lightgbm:
+    n_estimators: 300
+    max_depth: 10
+    learning_rate: 0.1
+    num_leaves: 31
+    random_state: 42
+  
+  lstm:
+    sequence_length: 10
+    hidden_units: [64, 32]
+    dropout: 0.2
+    epochs: 50
+    batch_size: 32
+  
+  isolation_forest:
+    contamination: 0.1
+    random_state: 42
+  
+  autoencoder:
+    encoding_dim: 32
+    epochs: 100
+    batch_size: 32
+
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1", "roc_auc"]
+  cv_folds: 5
+  min_precision: 0.80
+  min_recall: 0.75
+  min_f1: 0.77
+
+reports:
+  template: "default"
+  output_path: "reports/"
+  include_shap: true
+  include_trends: true
+  chart_style: "professional"  # Options: professional, technical, simple
+  risk_thresholds:
+    critical: 0.8  # >80% failure probability
+    high: 0.6
+    medium: 0.4
+    low: 0.2
+  
+prediction:
+  confidence_threshold: 0.7
+  enable_uncertainty: true
+  
+retraining:
+  schedule: "weekly"  # Options: daily, weekly, monthly
+  auto_retrain: false
+  min_samples_for_retrain: 100
+  performance_degradation_threshold: 0.05  # Retrain if F1 drops by 5%
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  enable_docs: true
+  max_batch_size: 1000

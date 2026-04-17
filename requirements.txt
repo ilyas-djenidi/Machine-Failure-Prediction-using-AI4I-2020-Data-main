@@ -1,0 +1,77 @@
+# Core Data Science
+numpy>=1.24.0
+pandas>=2.0.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Machine Learning
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+lightgbm>=4.0.0
+plotly
+imbalanced-learn>=0.11.0
+
+# Deep Learning
+tensorflow>=2.15.0
+# OR use pytorch if preferred:
+
+# Deep Learning (optional)
+tensorflow>=2.13.0
+
+# Model Interpretation
+shap>=0.42.0
+
+# Reporting
+reportlab>=4.0.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Web Interface
+streamlit>=1.28.0
+
+# Configuration
+pyyaml>=6.0
+
+# ============================================
+# PHASE 2: ALGERIAN INDUSTRIAL DEPLOYMENT
+# ============================================
+
+# === MOBILE PWA (HIGHEST PRIORITY) ===
+# Photo-based gauge reading
+easyocr==1.7.0           # OCR with Arabic support
+pytesseract==0.3.10      # Alternative OCR engine
+opencv-python==4.8.1.78  # Image preprocessing
+Pillow==10.1.0           # Image handling
+
+# Voice input
+SpeechRecognition==3.10.0  # Arabic voice input
+pydub==0.25.1              # Audio processing
+PyAudio==0.2.14            # Microphone access (may need system packages)
+
+# === Industrial Connectivity ===
+pymodbus==3.5.2          # Modbus TCP (Schneider)
+opcua==0.98.13           # OPC UA protocol
+python-snap7==1.3        # Siemens S7 PLCs
+
+# === Offline Database ===
+sqlalchemy==2.0.23       # ORM for local database
+
+# === WhatsApp Alerts ===
+twilio==8.10.0           # WhatsApp via Twilio
+
+# === Arabic/French Text Support ===
+arabic-reshaper==3.0.0   # Arabic text rendering
+python-bidi==0.4.2       # Bidirectional text support
+
+# === Data Sources (from Phase 1) ===
+ucimlrepo>=0.1.0
+kagglehub>=0.2.0
+
+# === Utilities ===
+joblib>=1.3.0
+tqdm>=4.66.0
+
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0

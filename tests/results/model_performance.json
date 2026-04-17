@@ -1,0 +1,34 @@
+{
+    "results": {
+        "Random Forest": {
+            "accuracy": 0.981,
+            "precision": 0.9411764705882353,
+            "recall": 0.47058823529411764,
+            "f1": 0.6274509803921569,
+            "roc_auc": 0.9632276823772989
+        },
+        "XGBoost": {
+            "accuracy": 0.981,
+            "precision": 0.7027027027027027,
+            "recall": 0.7647058823529411,
+            "f1": 0.7323943661971831,
+            "roc_auc": 0.96150742905858
+        },
+        "LightGBM": {
+            "accuracy": 0.9795,
+            "precision": 0.6666666666666666,
+            "recall": 0.7941176470588235,
+            "f1": 0.7248322147651006,
+            "roc_auc": 0.9667214711971746
+        }
+    },
+    "best_model": "XGBoost",
+    "thresholds": {
+        "accuracy": 0.8,
+        "precision": 0.8,
+        "recall": 0.75,
+        "f1": 0.77,
+        "roc_auc": 0.9
+    },
+    "passed": false
+}
