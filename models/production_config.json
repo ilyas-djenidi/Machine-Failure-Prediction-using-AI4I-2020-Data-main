@@ -1,0 +1,30 @@
+{
+  "timestamp": "20260418_004903",
+  "model_name": "lgb",
+  "model_path": "C:\\Users\\len\\Desktop\\Machine-Failure-Prediction-using-AI4I-2020-Data-main\\models\\best_model_20260418_004903.pkl",
+  "scaler_path": "C:\\Users\\len\\Desktop\\Machine-Failure-Prediction-using-AI4I-2020-Data-main\\models\\scaler_20260418_004903.pkl",
+  "feature_cols_path": "C:\\Users\\len\\Desktop\\Machine-Failure-Prediction-using-AI4I-2020-Data-main\\models\\feature_cols_20260418_004903.json",
+  "threshold": 0.4,
+  "test_metrics": {
+    "model": "RetryEnsemble",
+    "threshold": 0.4,
+    "precision": 0.6551724137931034,
+    "recall": 0.8382352941176471,
+    "f1": 0.7354838709677419,
+    "roc_auc": 0.9830334307636098
+  },
+  "optuna_best_f1": 0.9014084507042254,
+  "optuna_best_params": {
+    "n_estimators": 312,
+    "max_depth": 8,
+    "learning_rate": 0.05224014368236158,
+    "subsample": 0.8943398990569542,
+    "colsample_bytree": 0.7296750502053012,
+    "min_child_weight": 1,
+    "gamma": 0.703501964288424,
+    "reg_alpha": 0.0029236380687157775,
+    "reg_lambda": 0.14284822145067597
+  },
+  "feature_count": 36,
+  "training_samples": 13526
+}
