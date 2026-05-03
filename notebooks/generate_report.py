@@ -133,7 +133,16 @@ def generate_report(prediction: dict, manufacturer: str = "Siemens") -> dict:
     ts    = datetime.now().strftime("%d/%m/%Y  %H:%M:%S")
     mid   = prediction.get("machine_id", "N/A")
     prob  = prediction.get("failure_probability_pct", 0.0)
-    risk  = prediction.get("risk_level", "NORMAL")
+
+    # BUG 9 fix: normalize English → French risk keys
+    RISK_NORMALIZE = {
+        "CRITICAL" : "CRITIQUE", "HIGH"     : "URGENT",
+        "MEDIUM"   : "ATTENTION", "LOW"     : "SURVEILLER",
+        "CRITIQUE" : "CRITIQUE", "URGENT"   : "URGENT",
+        "ATTENTION": "ATTENTION", "SURVEILLER": "SURVEILLER",
+        "NORMAL"   : "NORMAL",
+    }
+    risk  = RISK_NORMALIZE.get(prediction.get("risk_level", "NORMAL"), "NORMAL")
     icon  = prediction.get("risk_icon", "🟢")
     ttf   = prediction.get("time_to_failure_estimate", "—")
     modes = prediction.get("likely_failure_modes", [])
@@ -276,3 +285,110 @@ def _maintenance_schedule(risk: str) -> list[str]:
         ],
     }
     return schedules.get(risk, ["Consulter le responsable maintenance."])
+
+
+# ---------------------------------------------------------------------------
+# REQ-2: PDF export using reportlab
+# ---------------------------------------------------------------------------
+def save_pdf(path: str, report_dict: dict) -> None:
+    """
+    Save a diagnostic report as a formatted PDF.
+
+    Args:
+        path        : destination file path, e.g. 'reports/rapport_M01.pdf'
+        report_dict : dict returned by generate_report() — must have 'lines' key
+
+    Raises:
+        ImportError if reportlab is not installed (pip install reportlab)
+    """
+    try:
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import cm
+        from reportlab.lib import colors
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
+        from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    except ImportError as e:
+        raise ImportError(
+            "reportlab is required for PDF export. "
+            "Install it with:  pip install reportlab"
+        ) from e
+
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+
+    doc = SimpleDocTemplate(
+        path,
+        pagesize=A4,
+        rightMargin=2 * cm, leftMargin=2 * cm,
+        topMargin=2 * cm,   bottomMargin=2 * cm,
+    )
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        "Title", parent=styles["Title"],
+        fontSize=14, textColor=colors.HexColor("#1a237e"),
+        alignment=TA_CENTER, spaceAfter=6,
+    )
+    header_style = ParagraphStyle(
+        "Header", parent=styles["Heading2"],
+        fontSize=11, textColor=colors.HexColor("#c62828"),
+        spaceBefore=8, spaceAfter=4,
+    )
+    body_style = ParagraphStyle(
+        "Body", parent=styles["Normal"],
+        fontSize=9, leading=13,
+        fontName="Helvetica",
+    )
+    small_style = ParagraphStyle(
+        "Small", parent=styles["Normal"],
+        fontSize=8, leading=11,
+        textColor=colors.HexColor("#555555"),
+    )
+
+    story = []
+
+    # ── Factory logo placeholder ──────────────────────────────────────────────
+    story.append(Paragraph("🏭  USINE M'SILA — MAINTENANCE PRÉDICTIVE", title_style))
+    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#1a237e")))
+    story.append(Spacer(1, 0.3 * cm))
+
+    lines = report_dict.get("lines", [])
+    in_section = False
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            story.append(Spacer(1, 0.2 * cm))
+            continue
+
+        if stripped.startswith("=") and len(stripped) > 10:
+            story.append(HRFlowable(width="100%", thickness=0.5,
+                                    color=colors.HexColor("#9e9e9e")))
+            continue
+
+        if stripped.startswith("─") and len(stripped) > 5:
+            story.append(HRFlowable(width="100%", thickness=0.3,
+                                    color=colors.HexColor("#bdbdbd")))
+            in_section = True
+            continue
+
+        if in_section and stripped.isupper() and len(stripped) > 4:
+            story.append(Paragraph(stripped, header_style))
+            in_section = False
+            continue
+
+        # Escape XML special chars for reportlab
+        safe = stripped.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        if stripped.startswith("▶") or stripped.startswith("→"):
+            story.append(Paragraph(safe, header_style))
+        else:
+            story.append(Paragraph(safe, body_style))
+
+    story.append(Spacer(1, 0.5 * cm))
+    story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#9e9e9e")))
+    story.append(Paragraph(
+        "Rapport généré automatiquement — Système IA Prédictif v3 — M'Sila, Algérie",
+        small_style))
+
+    doc.build(story)
+    print(f"[PDF] Rapport sauvegardé : {path}")

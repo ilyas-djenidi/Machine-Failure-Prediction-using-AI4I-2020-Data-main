@@ -41,7 +41,10 @@ class DriftDetector:
         if self.ref_df is None:
             self.load_reference()
             if self.ref_df is None:
-                return {"error": "Reference data not available."}
+                return {
+                    "error": f"Reference data not available. Expected CSV at: {self.ref_csv}",
+                    "drift_detected": False,
+                }
                 
         results = {"drift_detected": False, "features": {}}
         drift_count = 0

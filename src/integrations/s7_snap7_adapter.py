@@ -6,6 +6,8 @@ Uses python-snap7 to read Data Blocks (DBs) directly from S7-1200/1500 or S7-300
 import snap7
 from snap7.util import get_real, get_bool
 import logging
+import time
+from datetime import datetime, timezone
 
 logging.basicConfig(level=logging.INFO)
 
@@ -29,37 +31,43 @@ class S7Adapter:
             self.client.disconnect()
             logging.info("Disconnected from S7 PLC.")
             
-    def read_motor_db(self, db_number: int, start_offset: int = 0) -> dict:
+    def read_motor_db(self, db_number: int, start_offset: int = 0, retries: int = 3) -> dict:
         """
-        Reads a standard Motor DB.
-        Assumes the following DB structure (example):
-        Offset 0.0: AmbientTemp (REAL)
-        Offset 4.0: MotorTemp (REAL)
-        Offset 8.0: Speed_RPM (REAL)
-        Offset 12.0: Torque_Nm (REAL)
-        Offset 16.0: RunHours (REAL)
-        Offset 20.0: FaultBit (BOOL)
+        Reads a standard Motor DB with exponential-backoff retry (BUG 11 fix).
+        Assumes the following DB structure:
+          Offset  0.0: AmbientTemp (REAL)
+          Offset  4.0: MotorTemp   (REAL)
+          Offset  8.0: Speed_RPM   (REAL)
+          Offset 12.0: Torque_Nm   (REAL)
+          Offset 16.0: RunHours    (REAL)
+          Offset 20.0: FaultBit    (BOOL bit 0)
         """
-        if not self.client.get_connected():
-            logging.warning("Not connected. Attempting connection...")
-            self.connect()
-            
-        try:
-            # Read 21 bytes to cover offsets 0 to 20
-            buffer = self.client.db_read(db_number, start_offset, 21)
-            
-            data = {
-                "AmbientTemp": get_real(buffer, 0),
-                "MotorTemp": get_real(buffer, 4),
-                "Speed_RPM": get_real(buffer, 8),
-                "Torque_Nm": get_real(buffer, 12),
-                "RunHours": get_real(buffer, 16),
-                "FaultBit": get_bool(buffer, 20, 0),
-            }
-            return data
-        except Exception as e:
-            logging.error(f"Failed to read DB {db_number}: {e}")
-            return {}
+        for attempt in range(retries):
+            if not self.client.get_connected():
+                try:
+                    self.connect()
+                except Exception as e:
+                    wait = 2 ** attempt
+                    logging.warning(f"Reconnect attempt {attempt+1} failed: {e}. Retrying in {wait}s")
+                    time.sleep(wait)
+                    continue
+            try:
+                buffer = self.client.db_read(db_number, start_offset, 21)
+                return {
+                    "AmbientTemp": round(get_real(buffer, 0),  2),
+                    "MotorTemp"  : round(get_real(buffer, 4),  2),
+                    "Speed_RPM"  : round(get_real(buffer, 8),  1),
+                    "Torque_Nm"  : round(get_real(buffer, 12), 2),
+                    "RunHours"   : round(get_real(buffer, 16), 4),
+                    "FaultBit"   : get_bool(buffer, 20, 0),
+                    "timestamp"  : datetime.now(timezone.utc).isoformat(),
+                }
+            except Exception as e:
+                wait = 2 ** attempt
+                logging.error(f"Read attempt {attempt+1}/{retries} failed for DB{db_number}: {e}. Retrying in {wait}s")
+                time.sleep(wait)
+        logging.error(f"All {retries} read attempts failed for DB{db_number}. Returning empty dict.")
+        return {}
 
 if __name__ == "__main__":
     # Example usage

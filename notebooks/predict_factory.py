@@ -171,11 +171,11 @@ class MotorFailurePredictor:
         with open(config_path) as f:
             cfg = json.load(f)
 
-        # Load model
+        # Load model artifact — may be a weighted_avg dict (BUG 6 fix)
         model_path = Path(cfg["model_path"])
         if not model_path.exists():
             raise FileNotFoundError(f"Model file not found: {model_path}")
-        model = joblib.load(model_path)
+        artifact = joblib.load(model_path)
 
         # Load scaler
         scaler = joblib.load(cfg["scaler_path"])
@@ -184,14 +184,16 @@ class MotorFailurePredictor:
         with open(cfg["feature_cols_path"]) as f:
             fcols = json.load(f)
 
-        # FIX 1: Load rpm_mean — raise if missing, never silently use hardcoded fallback
-        rpm_path = Path(cfg.get("rpm_mean_path", ""))
-        if not rpm_path.exists():
-            raise FileNotFoundError(
-                f"rpm_mean file not found: {rpm_path}\n"
-                f"This means Speed_Deviation will be wrong. Retrain the model.")
-        with open(rpm_path) as f:
-            rpm_mean = float(json.load(f)["rpm_mean"])
+        # FIX 1 + BUG 6: Load rpm_mean — prefer inline value in config, fall back to JSON file
+        rpm_mean = float(cfg.get("rpm_mean_value", 0.0))
+        if rpm_mean == 0.0:
+            rpm_path = Path(cfg.get("rpm_mean_path", ""))
+            if not rpm_path.exists():
+                raise FileNotFoundError(
+                    f"rpm_mean file not found: {rpm_path}\n"
+                    f"This means Speed_Deviation will be wrong. Retrain the model.")
+            with open(rpm_path) as f:
+                rpm_mean = float(json.load(f)["rpm_mean"])
 
         # FIX 4: Load anomaly guard from config path (not hardcoded sibling path)
         anomaly_model = None
@@ -208,7 +210,7 @@ class MotorFailurePredictor:
 
         print(f"[PREDICTOR] Loaded: {model_name}")
         print(f"[PREDICTOR] Threshold={threshold:.2f}  RPM mean={rpm_mean:.2f}")
-        return cls(model, scaler, fcols, rpm_mean, threshold, anomaly_model, model_name)
+        return cls(artifact, scaler, fcols, rpm_mean, threshold, anomaly_model, model_name)
 
     def _convert_tags(self, raw: dict) -> dict:
         """
@@ -260,6 +262,19 @@ class MotorFailurePredictor:
             if prob >= min_p:
                 return level, action, icon
         return "NORMAL", "Fonctionnement normal", "🟢"
+
+    def _predict_proba_single(self, X_scaled) -> float:
+        """BUG 6 fix: dispatch to weighted_avg dict or legacy single model."""
+        if isinstance(self.model, dict) and self.model.get("type") == "weighted_avg":
+            ed = self.model
+            w  = ed["weights"]
+            total_w = sum(w.values())
+            return float(sum(
+                w[n] * ed["models"][n].predict_proba(X_scaled)[0, 1]
+                for n in w
+            ) / total_w)
+        else:
+            return float(self.model.predict_proba(X_scaled)[0, 1])
 
     def predict(self,
                 raw_input: dict,
@@ -334,8 +349,8 @@ class MotorFailurePredictor:
                                          if k in SENSOR_BOUNDS},
                 }
 
-        # 7. Predict
-        prob  = float(self.model.predict_proba(X_scaled)[0, 1])
+        # 7. Predict (BUG 6 fix: use dispatch method)
+        prob  = self._predict_proba_single(X_scaled)
         risk, action, icon = self._get_risk(prob)
         modes = _detect_likely_modes(sensors)
 
@@ -344,6 +359,14 @@ class MotorFailurePredictor:
         tor_val  = sensors.get("Torque [Nm]", 40.0)
         power_w  = tor_val * rpm_val * (2 * np.pi / 60)
         temp_diff = sensors.get("Process temperature [K]", 310) - sensors.get("Air temperature [K]", 300)
+
+        TTF_MAP = {
+            "CRITIQUE"  : "1–3 jours",
+            "URGENT"    : "3–7 jours",
+            "ATTENTION" : "7–14 jours",
+            "SURVEILLER": "14–30 jours",
+            "NORMAL"    : "> 30 jours",
+        }
 
         return {
             "machine_id"              : machine_id,
@@ -358,6 +381,7 @@ class MotorFailurePredictor:
             "likely_failure_modes"    : modes if modes else ["—"],
             "confidence"              : round(abs(prob - 0.5) / 0.5, 4),
             "threshold_used"          : self.threshold,
+            "time_to_failure_estimate": TTF_MAP.get(risk, "—"),
             "sensor_snapshot"         : {
                 "air_temp_K"    : round(sensors.get("Air temperature [K]", 0), 1),
                 "motor_temp_K"  : round(sensors.get("Process temperature [K]", 0), 1),
@@ -367,6 +391,75 @@ class MotorFailurePredictor:
                 "wear_min"      : round(sensors.get("Tool wear [min]", 0), 1),
                 "power_W"       : round(power_w, 1),
             },
+        }
+
+
+    def predict_7day_window(self, readings_df: pd.DataFrame, machine_id: str = "M_XXX") -> dict:
+        """
+        REQ-1: Batch prediction over a rolling 7-day sensor time series.
+
+        Args:
+            readings_df : DataFrame with sensor columns + optional 'timestamp' column.
+                          Rows should be ordered oldest → newest (one row per hour recommended).
+            machine_id  : motor identifier.
+
+        Returns:
+            dict with:
+              'predictions'       — list of per-row prediction dicts
+              'daily_risk'        — list of daily max risk levels
+              'trend_slope'       — linear slope of failure probability over time (pct/row)
+              'days_to_failure'   — estimated days until failure_probability_pct >= 60 (URGENT)
+              'summary_risk'      — overall risk level from the last reading
+        """
+        results = []
+        for _, row in readings_df.iterrows():
+            raw = row.to_dict()
+            raw.pop("timestamp", None)
+            try:
+                r = self.predict(raw_input=raw, machine_id=machine_id)
+                results.append(r)
+            except Exception:
+                results.append({"failure_probability_pct": 0.0, "risk_level": "NORMAL"})
+
+        probs = [r.get("failure_probability_pct", 0.0) for r in results]
+        n = len(probs)
+
+        # Linear trend via least-squares
+        if n >= 2:
+            x = np.arange(n, dtype=float)
+            coeffs = np.polyfit(x, probs, 1)
+            slope, intercept = float(coeffs[0]), float(coeffs[1])
+        else:
+            slope, intercept = 0.0, probs[0] if probs else 0.0
+
+        # Extrapolate to URGENT threshold (60 %)
+        URGENT_THR = 60.0
+        if slope > 0:
+            rows_to_urgent = (URGENT_THR - (intercept + slope * (n - 1))) / slope
+            # Convert rows → days: assume 1 reading per hour → 24 rows/day
+            readings_per_day = max(1, round(n / 7)) if n >= 7 else 1
+            days_to_failure  = round(max(0.0, rows_to_urgent / readings_per_day), 1)
+        else:
+            days_to_failure = None  # no convergence toward failure
+
+        # Daily max risk (bucket rows into days)
+        RISK_ORDER = ["NORMAL", "SURVEILLER", "ATTENTION", "URGENT", "CRITIQUE"]
+        bucket_size = max(1, n // 7)
+        daily_risk = []
+        for i in range(0, n, bucket_size):
+            bucket = [r.get("risk_level", "NORMAL") for r in results[i:i + bucket_size]]
+            top_risk = max(bucket, key=lambda lv: RISK_ORDER.index(lv) if lv in RISK_ORDER else 0)
+            daily_risk.append(top_risk)
+
+        summary_risk = results[-1].get("risk_level", "NORMAL") if results else "NORMAL"
+
+        return {
+            "machine_id"      : machine_id,
+            "predictions"     : results,
+            "daily_risk"      : daily_risk,
+            "trend_slope_pct" : round(slope, 4),
+            "days_to_failure" : days_to_failure,
+            "summary_risk"    : summary_risk,
         }
 
 
