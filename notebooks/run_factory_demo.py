@@ -8,7 +8,10 @@ Run:  python notebooks/run_factory_demo.py
 =============================================================================
 """
 
-import json, sys
+import json, sys, io
+# Fix Windows console Unicode encoding
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -107,9 +110,9 @@ SCENARIOS = [
 all_results = []
 
 for i, scenario in enumerate(SCENARIOS, 1):
-    print(f"\n{'─'*65}")
+    print(f"\n{'-'*65}")
     print(f"  SCÉNARIO {i}: {scenario['description']}")
-    print(f"{'─'*65}")
+    print(f"{'-'*65}")
 
     result = predictor.predict(
         scenario["input"],
@@ -128,20 +131,27 @@ for i, scenario in enumerate(SCENARIOS, 1):
     report = generate_report(result, manufacturer=scenario["manufacturer"])
     print("\n" + report["text"])
 
-    # Save report to file
-    report_path = REPORTS_DIR / f"rapport_{result['machine_id']}_{result['timestamp'][:10]}.txt"
-    report["save"](str(report_path))
+    # Save report to file (TXT + PDF)
+    report_base = REPORTS_DIR / f"rapport_{result['machine_id']}_{result['timestamp'][:10]}"
+    report["save"](str(report_base) + ".txt")
+    
+    # REQ-2: PDF generation
+    try:
+        from generate_report import save_pdf
+        save_pdf(str(report_base) + ".pdf", report)
+    except Exception as e:
+        print(f"  [PDF ERROR] Could not save PDF: {e}")
 
     all_results.append(result)
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # Step 4: Summary table
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 print("\n" + "=" * 65)
 print("  RÉSUMÉ — TABLEAU DE BORD USINE")
 print("=" * 65)
 print(f"  {'Machine':<15} {'Probabilité':>12}  {'Risque':<12}  {'Délai panne':<18}  {'Modes'}")
-print(f"  {'─'*13:<15} {'─'*10:>12}  {'─'*10:<12}  {'─'*16:<18}  {'─'*20}")
+print(f"  {'-'*13:<15} {'-'*10:>12}  {'-'*10:<12}  {'-'*16:<18}  {'-'*20}")
 for r in all_results:
     modes = ", ".join(r["likely_failure_modes"])
     print(f"  {r['machine_id']:<15} {r['failure_probability_pct']:>11.1f}%  "

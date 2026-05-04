@@ -129,7 +129,7 @@ except Exception as e:
     print(f"  [{FAIL}] {e}")
     errors.append(f"CHECK 6: {e}")
 
-# ── SUMMARY ───────────────────────────────────────────────────────────────
+# -- SUMMARY ---------------------------------------------------------------
 print("\n" + "=" * 60)
 if not errors:
     print(f"\033[92m ALL CHECKS PASSED \033[0m")
