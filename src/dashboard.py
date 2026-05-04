@@ -106,7 +106,8 @@ with tab1:
         res_col1, res_col2 = st.columns([1, 2])
         
         with res_col1:
-            prob = result["failure_probability_pct"]
+            # Handle key variations
+            prob = result.get("failure_prob", result.get("failure_probability_pct", 0.0))
             risk = result["risk_level"]
             icon = result["risk_icon"]
             
@@ -158,7 +159,13 @@ with tab2:
             data = json.load(f)
             df = pd.DataFrame(data)
             if not df.empty:
-                st.dataframe(df[["machine_id", "failure_probability_pct", "risk_level", "time_to_failure_estimate"]], use_container_width=True)
+                # Handle inconsistent naming between old/new files
+                if "failure_probability_pct" in df.columns:
+                    df = df.rename(columns={"failure_probability_pct": "failure_prob"})
+                
+                # Show columns that exist
+                cols = [c for c in ["machine_id", "failure_prob", "risk_level", "time_to_failure_estimate"] if c in df.columns]
+                st.dataframe(df[cols], use_container_width=True)
             else:
                 st.info("Historique vide.")
     else:
