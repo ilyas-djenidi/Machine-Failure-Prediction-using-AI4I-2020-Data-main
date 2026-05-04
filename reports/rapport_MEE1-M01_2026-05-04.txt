@@ -1,0 +1,72 @@
+====================================================================
+  RAPPORT DE MAINTENANCE PRÉDICTIVE — MOTEUR ASYNCHRONE
+  Système  : Prédiction de défaillance (IA / Machine Learning)
+  Fabriquant: SIEMENS (Algérie)
+====================================================================
+  Machine ID    : MEE1-M01
+  Date / Heure  : 04/05/2026  01:37:15
+  Modèle IA     : XGBoost + LightGBM Ensemble (Optuna tuned)
+
+────────────────────────────────────────────────────────────────────
+  RÉSULTAT DU DIAGNOSTIC
+────────────────────────────────────────────────────────────────────
+  Probabilité de défaillance : 99.3 %
+  Niveau de risque           : 🔴 CRITIQUE
+  Délai estimé avant panne   : 1–3 jours
+  Confiance du modèle        : 98.6 %
+
+  → ⛔ ARRÊT IMMÉDIAT REQUIS — Défaillance imminente dans 1 à 3 jours.
+
+────────────────────────────────────────────────────────────────────
+  DONNÉES CAPTEURS (snapshot)
+────────────────────────────────────────────────────────────────────
+  Température ambiante  : 308.1 K  (35.0 °C)
+  Température moteur    : 331.6 K  (58.5 °C)
+  Vitesse de rotation   : 1360.0 tr/min
+  Couple                : 65.0 Nm
+  Usure / Heures marche : 228.0 min
+  Puissance mécanique   : 9257.2 W
+  ΔT (process − ambiant): 23.5 K  OK
+
+────────────────────────────────────────────────────────────────────
+  MODES DE DÉFAILLANCE IDENTIFIÉS
+────────────────────────────────────────────────────────────────────
+
+  ▶ Défaut d'usure d'outil (TWF)
+    Cause : L'usure de l'élément mécanique a dépassé le seuil critique (≥ 200 min). Les frottements et les contraintes mécaniques augmentent, entraînant une dégradation accélérée des composants.
+
+    Actions correctives :
+      1. Arrêter la machine et inspecter l'outil ou la pièce usée.
+      2. Remplacer l'élément défaillant par une pièce conforme.
+      3. Inspecter les roulements et le palier de l'arbre.
+      4. Effectuer un contrôle d'alignement de l'axe moteur.
+      5. Réaliser une analyse vibratoire après remplacement.
+
+    Siemens : Vérifier le compteur d'heures de marche dans le bloc FC (OB1 / DB_Moteur).
+
+  ▶ Défaut de surcontrainte (OSF)
+    Cause : L'indice de surcontrainte (usure × couple) dépasse 13 000 Nm·min. Le moteur ou la transmission fonctionne au-delà de ses limites de conception, risquant une rupture mécanique ou un défaut d'arbre.
+
+    Actions correctives :
+      1. Réduire immédiatement la charge ou le couple appliqué.
+      2. Inspecter les accouplements et la transmission mécanique.
+      3. Vérifier le dimensionnement du moteur par rapport à la charge réelle.
+      4. Planifier une révision complète de la ligne de transmission.
+      5. Vérifier l'état des garnitures d'étanchéité et du joint d'arbre.
+
+    Siemens : Activer le limiteur de couple dans TIA Portal (FB_DriveControl, paramètre p1520).
+
+────────────────────────────────────────────────────────────────────
+  RECOMMANDATION DE PLANIFICATION
+────────────────────────────────────────────────────────────────────
+  ⛔ Arrêter la machine IMMÉDIATEMENT.
+  → Convoquer l'équipe de maintenance d'urgence.
+  → Ne pas remettre en marche avant inspection complète.
+  → Notifier le responsable de production.
+
+====================================================================
+  Ce rapport est généré automatiquement par le système IA de
+  maintenance prédictive. Il ne remplace pas le jugement d'un
+  technicien qualifié. Conserver ce document dans le registre
+  de maintenance de l'installation.
+====================================================================

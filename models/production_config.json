@@ -1,11 +1,11 @@
 {
-  "timestamp": "20260503_164020",
+  "timestamp": "20260504_002448",
   "model_name": "Ensemble",
-  "model_path": "C:\\Users\\len\\Desktop\\Machine-Failure-Prediction-using-AI4I-2020-Data-main\\models\\best_model_20260503_164020.pkl",
-  "scaler_path": "C:\\Users\\len\\Desktop\\Machine-Failure-Prediction-using-AI4I-2020-Data-main\\models\\scaler_20260503_164020.pkl",
-  "feature_cols_path": "C:\\Users\\len\\Desktop\\Machine-Failure-Prediction-using-AI4I-2020-Data-main\\models\\feature_cols_20260503_164020.json",
-  "rpm_mean_path": "C:\\Users\\len\\Desktop\\Machine-Failure-Prediction-using-AI4I-2020-Data-main\\models\\rpm_mean_20260503_164020.json",
-  "anomaly_guard_path": "C:\\Users\\len\\Desktop\\Machine-Failure-Prediction-using-AI4I-2020-Data-main\\models\\anomaly_guard.pkl",
+  "model_path": "models/best_model_20260504_002448.pkl",
+  "scaler_path": "models/scaler_20260504_002448.pkl",
+  "feature_cols_path": "models/feature_cols_20260504_002448.json",
+  "rpm_mean_path": "models/rpm_mean_20260504_002448.json",
+  "anomaly_guard_path": "models/anomaly_guard.pkl",
   "threshold": 0.42,
   "test_metrics": {
     "model": "Ensemble",

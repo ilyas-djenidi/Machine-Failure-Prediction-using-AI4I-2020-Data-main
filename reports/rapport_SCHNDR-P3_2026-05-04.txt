@@ -1,0 +1,60 @@
+====================================================================
+  RAPPORT DE MAINTENANCE PRÉDICTIVE — MOTEUR ASYNCHRONE
+  Système  : Prédiction de défaillance (IA / Machine Learning)
+  Fabriquant: SCHNEIDER (Algérie)
+====================================================================
+  Machine ID    : SCHNDR-P3
+  Date / Heure  : 04/05/2026  01:37:16
+  Modèle IA     : XGBoost + LightGBM Ensemble (Optuna tuned)
+
+────────────────────────────────────────────────────────────────────
+  RÉSULTAT DU DIAGNOSTIC
+────────────────────────────────────────────────────────────────────
+  Probabilité de défaillance : 84.5 %
+  Niveau de risque           : 🔴 CRITIQUE
+  Délai estimé avant panne   : 1–3 jours
+  Confiance du modèle        : 69.1 %
+
+  → ⛔ ARRÊT IMMÉDIAT REQUIS — Défaillance imminente dans 1 à 3 jours.
+
+────────────────────────────────────────────────────────────────────
+  DONNÉES CAPTEURS (snapshot)
+────────────────────────────────────────────────────────────────────
+  Température ambiante  : 302.0 K  (28.9 °C)
+  Température moteur    : 315.0 K  (41.9 °C)
+  Vitesse de rotation   : 2750 tr/min
+  Couple                : 72.0 Nm
+  Usure / Heures marche : 95 min
+  Puissance mécanique   : 20734.5 W
+  ΔT (process − ambiant): 13.0 K  OK
+
+────────────────────────────────────────────────────────────────────
+  MODES DE DÉFAILLANCE IDENTIFIÉS
+────────────────────────────────────────────────────────────────────
+
+  ▶ Défaut de puissance (PWF)
+    Cause : La puissance mécanique calculée (P = C × ω) est en dehors de la plage nominale [3 500 – 9 500 W]. Cela peut indiquer une surcharge, une sous-charge anormale, un défaut du variateur de fréquence (VFD), ou un problème d'alimentation.
+
+    Actions correctives :
+      1. Vérifier la charge mécanique raccordée au moteur.
+      2. Contrôler les paramètres du variateur (fréquence, courant limite).
+      3. Mesurer la tension et le courant d'alimentation (trois phases).
+      4. Vérifier les protections thermiques (relais, disjoncteur).
+      5. Contrôler l'état des condensateurs de compensation si présents.
+
+    Schneider: Consulter les paramètres ATV320/ATV630 : P1.2 (courant nominal), F602 (défaut surcharge).
+
+────────────────────────────────────────────────────────────────────
+  RECOMMANDATION DE PLANIFICATION
+────────────────────────────────────────────────────────────────────
+  ⛔ Arrêter la machine IMMÉDIATEMENT.
+  → Convoquer l'équipe de maintenance d'urgence.
+  → Ne pas remettre en marche avant inspection complète.
+  → Notifier le responsable de production.
+
+====================================================================
+  Ce rapport est généré automatiquement par le système IA de
+  maintenance prédictive. Il ne remplace pas le jugement d'un
+  technicien qualifié. Conserver ce document dans le registre
+  de maintenance de l'installation.
+====================================================================
