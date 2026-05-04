@@ -102,12 +102,22 @@ with tab1:
         
         st.divider()
         
-        # Results Display
+        # Check if prediction was skipped (Anomaly or Validation Error)
+        if result.get("skip_prediction"):
+            st.warning(f"⚠️ {result['action']}")
+            if "validation_warnings" in result:
+                for w in result["validation_warnings"]:
+                    st.error(f"Détail: {w}")
+            if "anomaly_score" in result:
+                st.info(f"Score d'anomalie: {result['anomaly_score']}")
+            st.stop()
+
+        # Results Display (Prediction succeeded)
         res_col1, res_col2 = st.columns([1, 2])
         
         with res_col1:
-            # Handle key variations
-            prob = result.get("failure_prob", result.get("failure_probability_pct", 0.0))
+            # Reverting to the correct key name from predict_factory.py
+            prob = result.get("failure_probability_pct", 0.0)
             risk = result["risk_level"]
             icon = result["risk_icon"]
             
