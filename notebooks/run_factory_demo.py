@@ -128,6 +128,7 @@ for i, scenario in enumerate(SCENARIOS, 1):
     print(f"  Confiance      : {result['confidence']*100:.1f} %")
 
     # Generate French report
+    from generate_report import generate_report, save_pdf
     report = generate_report(result, manufacturer=scenario["manufacturer"])
     print("\n" + report["text"])
 
@@ -137,7 +138,6 @@ for i, scenario in enumerate(SCENARIOS, 1):
     
     # REQ-2: PDF generation
     try:
-        from generate_report import save_pdf
         save_pdf(str(report_base) + ".pdf", report)
     except Exception as e:
         print(f"  [PDF ERROR] Could not save PDF: {e}")
