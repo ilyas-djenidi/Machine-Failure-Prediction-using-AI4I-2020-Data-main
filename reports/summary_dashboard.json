@@ -1,0 +1,107 @@
+[
+  {
+    "machine_id": "MEE1-M01",
+    "motor_type": "VIDA",
+    "model_name": "Ensemble",
+    "timestamp": "2026-05-04T01:37:15.599213",
+    "failure_probability_pct": 99.27,
+    "binary_prediction": 1,
+    "risk_level": "CRITIQUE",
+    "risk_icon": "🔴",
+    "action": "Arrêt immédiat machine — STOP NOW",
+    "likely_failure_modes": [
+      "TWF",
+      "OSF"
+    ],
+    "confidence": 0.9855,
+    "threshold_used": 0.42,
+    "time_to_failure_estimate": "1–3 jours",
+    "sensor_snapshot": {
+      "air_temp_K": 308.1,
+      "motor_temp_K": 331.6,
+      "temp_diff_K": 23.5,
+      "rpm": 1360.0,
+      "torque_Nm": 65.0,
+      "wear_min": 228.0,
+      "power_W": 9257.2
+    }
+  },
+  {
+    "machine_id": "SCHNDR-P3",
+    "motor_type": "VIDA",
+    "model_name": "Ensemble",
+    "timestamp": "2026-05-04T01:37:16.221699",
+    "failure_probability_pct": 84.53,
+    "binary_prediction": 1,
+    "risk_level": "CRITIQUE",
+    "risk_icon": "🔴",
+    "action": "Arrêt immédiat machine — STOP NOW",
+    "likely_failure_modes": [
+      "PWF"
+    ],
+    "confidence": 0.6906,
+    "threshold_used": 0.42,
+    "time_to_failure_estimate": "1–3 jours",
+    "sensor_snapshot": {
+      "air_temp_K": 302.0,
+      "motor_temp_K": 315.0,
+      "temp_diff_K": 13.0,
+      "rpm": 2750,
+      "torque_Nm": 72.0,
+      "wear_min": 95,
+      "power_W": 20734.5
+    }
+  },
+  {
+    "machine_id": "MEE1-M05",
+    "motor_type": "VIDA",
+    "model_name": "Ensemble",
+    "timestamp": "2026-05-04T01:37:16.987155",
+    "failure_probability_pct": 0.05,
+    "binary_prediction": 0,
+    "risk_level": "NORMAL",
+    "risk_icon": "🟢",
+    "action": "Fonctionnement normal",
+    "likely_failure_modes": [
+      "—"
+    ],
+    "confidence": 0.9989,
+    "threshold_used": 0.42,
+    "time_to_failure_estimate": "> 30 jours",
+    "sensor_snapshot": {
+      "air_temp_K": 301.1,
+      "motor_temp_K": 311.6,
+      "temp_diff_K": 10.5,
+      "rpm": 1502.0,
+      "torque_Nm": 38.5,
+      "wear_min": 72.0,
+      "power_W": 6055.6
+    }
+  },
+  {
+    "machine_id": "MEE1-M03",
+    "motor_type": "VIDA",
+    "model_name": "Ensemble",
+    "timestamp": "2026-05-04T01:37:17.622462",
+    "failure_probability_pct": 0.57,
+    "binary_prediction": 0,
+    "risk_level": "NORMAL",
+    "risk_icon": "🟢",
+    "action": "Fonctionnement normal",
+    "likely_failure_modes": [
+      "—"
+    ],
+    "confidence": 0.9887,
+    "threshold_used": 0.42,
+    "time_to_failure_estimate": "> 30 jours",
+    "sensor_snapshot": {
+      "air_temp_K": 304.1,
+      "motor_temp_K": 317.1,
+      "temp_diff_K": 13.0,
+      "rpm": 1420.0,
+      "torque_Nm": 52.0,
+      "wear_min": 174.0,
+      "power_W": 7732.5
+    }
+  }
+]

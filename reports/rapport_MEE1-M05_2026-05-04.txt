@@ -1,0 +1,49 @@
+====================================================================
+  RAPPORT DE MAINTENANCE PRÉDICTIVE — MOTEUR ASYNCHRONE
+  Système  : Prédiction de défaillance (IA / Machine Learning)
+  Fabriquant: SIEMENS (Algérie)
+====================================================================
+  Machine ID    : MEE1-M05
+  Date / Heure  : 04/05/2026  01:37:16
+  Modèle IA     : XGBoost + LightGBM Ensemble (Optuna tuned)
+
+────────────────────────────────────────────────────────────────────
+  RÉSULTAT DU DIAGNOSTIC
+────────────────────────────────────────────────────────────────────
+  Probabilité de défaillance : 0.1 %
+  Niveau de risque           : 🟢 NORMAL
+  Délai estimé avant panne   : > 30 jours
+  Confiance du modèle        : 99.9 %
+
+  → ✅ ÉTAT NORMAL — Aucune anomalie détectée. Prochain contrôle préventif selon planning.
+
+────────────────────────────────────────────────────────────────────
+  DONNÉES CAPTEURS (snapshot)
+────────────────────────────────────────────────────────────────────
+  Température ambiante  : 301.1 K  (28.0 °C)
+  Température moteur    : 311.6 K  (38.5 °C)
+  Vitesse de rotation   : 1502.0 tr/min
+  Couple                : 38.5 Nm
+  Usure / Heures marche : 72.0 min
+  Puissance mécanique   : 6055.6 W
+  ΔT (process − ambiant): 10.5 K  OK
+
+────────────────────────────────────────────────────────────────────
+  MODES DE DÉFAILLANCE IDENTIFIÉS
+────────────────────────────────────────────────────────────────────
+  Aucun mode de défaillance spécifique détecté.
+  Surveillance générale recommandée.
+
+────────────────────────────────────────────────────────────────────
+  RECOMMANDATION DE PLANIFICATION
+────────────────────────────────────────────────────────────────────
+  ✅ Continuer selon le planning de maintenance préventive.
+  → Prochain contrôle selon la fiche technique du moteur.
+  → Archiver ce rapport dans le dossier machine.
+
+====================================================================
+  Ce rapport est généré automatiquement par le système IA de
+  maintenance prédictive. Il ne remplace pas le jugement d'un
+  technicien qualifié. Conserver ce document dans le registre
+  de maintenance de l'installation.
+====================================================================
