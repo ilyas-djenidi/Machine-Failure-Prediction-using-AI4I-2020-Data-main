@@ -21,7 +21,7 @@ sys.path.insert(0, str(ROOT))
 from notebooks.predict_factory import MotorFailurePredictor
 from notebooks.generate_report import generate_report
 
-app = FastAPI(title="M'Sila Factory - Motor Predictive Maintenance API")
+app = FastAPI(title="Industrial AI - Motor Predictive Maintenance API")
 
 # Load model globally on startup (FIX BUG 10 / CHECK 3)
 CONFIG_PATH = ROOT / "models" / "production_config.json"

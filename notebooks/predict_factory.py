@@ -1,7 +1,7 @@
 """
 =============================================================================
 PRODUCTION PREDICTOR — predict_factory.py  (FULLY FIXED v3)
-Motor Failure Prediction — M'Sila Factory, Algeria
+Motor Failure Prediction — Industrial Production Plant
 =============================================================================
 All fixes from code review applied:
 
@@ -128,7 +128,7 @@ def _detect_likely_modes(sensors: dict) -> list[str]:
 # ─────────────────────────────────────────────────────────────────────────────
 class MotorFailurePredictor:
     """
-    Production inference engine for M'Sila factory motors.
+    Production inference engine for industrial plant motors.
 
     Usage:
         predictor = MotorFailurePredictor.from_config("models/production_config.json")

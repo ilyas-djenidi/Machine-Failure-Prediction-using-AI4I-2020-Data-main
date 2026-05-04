@@ -348,7 +348,7 @@ def save_pdf(path: str, report_dict: dict) -> None:
     story = []
 
     # ── Factory logo placeholder ──────────────────────────────────────────────
-    story.append(Paragraph("🏭  USINE M'SILA — MAINTENANCE PRÉDICTIVE", title_style))
+    story.append(Paragraph("🏭  CENTRE DE DIAGNOSTIC — MAINTENANCE PRÉDICTIVE", title_style))
     story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#1a237e")))
     story.append(Spacer(1, 0.3 * cm))
 
@@ -387,7 +387,7 @@ def save_pdf(path: str, report_dict: dict) -> None:
     story.append(Spacer(1, 0.5 * cm))
     story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#9e9e9e")))
     story.append(Paragraph(
-        "Rapport généré automatiquement — Système IA Prédictif v3 — M'Sila, Algérie",
+        "Rapport généré automatiquement — Système IA Prédictif v3 — Centre Industriel",
         small_style))
 
     doc.build(story)

@@ -15,7 +15,7 @@ from notebooks.generate_report import generate_report, save_pdf
 
 # Page Configuration
 st.set_page_config(
-    page_title="M'Sila Factory AI Dashboard",
+    page_title="AI Industrial Monitoring Dashboard",
     page_icon="🏭",
     layout="wide"
 )
@@ -57,7 +57,7 @@ predictor = load_model()
 # Header
 col1, col2 = st.columns([3, 1])
 with col1:
-    st.title("🏭 M'Sila Factory AI Dashboard")
+    st.title("🏭 AI Industrial Monitoring Dashboard")
     st.markdown("### Maintenance Prédictive des Moteurs Asynchrones")
 with col2:
     st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Siemens-logo.svg/1200px-Siemens-logo.svg.png", width=150)

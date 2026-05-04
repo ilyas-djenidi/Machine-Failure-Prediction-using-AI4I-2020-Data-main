@@ -1,7 +1,7 @@
 """
 =============================================================================
 PRODUCTION TRAINING PIPELINE — train_final.py  (FULLY FIXED)
-Motor Failure Prediction — M'Sila Factory, Algeria
+Motor Failure Prediction — Industrial Production Plant
 =============================================================================
 All 10 bugs found in code review are fixed here:
 

@@ -59,7 +59,7 @@ nb_cells = []
 
 # --- Title ---
 nb_cells.append(make_md_cell(
-    "# Motor Fault Prediction — Algerian Manufacturing Plant (M'Sila)\n"
+    "# Motor Fault Prediction — Industrial Manufacturing Plant\n"
     "> Production-grade predictive maintenance pipeline  \n"
     "> UCI AI4I 2020 | XGBoost + LightGBM + Optuna | SHAP | MotorFailurePredictor\n\n"
     "**Runtime**: GPU (T4) recommended — *Runtime > Change runtime type > T4 GPU*"
